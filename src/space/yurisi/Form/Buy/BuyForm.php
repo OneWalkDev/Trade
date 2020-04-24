@@ -226,33 +226,37 @@ class ConfirmSerachIDForm implements Form{
 	}
 
 	public function handleResponse(Player $player, $data): void {
-		if($data) {
-			if($this->data["player"]==$player->getName()){
-				$player->sendMessage("[§aTRADE§r] 自分の出品したアイテムは買えません。");
-				return;
-			}
-			$item = Item::get($this->data["itemid"], $this->data["itemdamage"], $this->data["amount"]);
-			if ($player->getInventory()->canAddItem($item)) {
-				EconomyAPI::getInstance()->reduceMoney($player->getName(), $this->data["price"]);
-				EconomyAPI::getInstance()->addMoney($this->data["player"], $this->data["price"]);
-				$player->getInventory()->addItem($item);
-				$cls=new YamlConfig();
-				$cls->removeItem($this->data["id"]);
-				$player->sendMessage("[§aTRADE§r] 購入が完了しました！");
-				$target=Server::getInstance()->getPlayer($this->data["player"]);
-				if($target instanceof Player){
-					$target->sendMessage("[§aTRADE§r] ID:{$this->id} が購入されました。");
+		if ($data) {
+			$cls = new YamlConfig();
+			if ($cls->exists($this->data["id"])) {
+				if ($this->data["player"] == $player->getName()) {
+					$player->sendMessage("[§aTRADE§r] 自分の出品したアイテムは買えません。");
+					return;
 				}
-				Server::getInstance()->getLogger()->notice("§r[§aTRADE§r] {$player->getName()}がID:{$this->id} {$this->data["player"]}の{$this->data["itemid"]}:{$this->data["itemdamage"]} {$this->data["amount"]}個を{$this->data["price"]}￥の取引が成立しました");
+				$item = Item::get($this->data["itemid"], $this->data["itemdamage"], $this->data["amount"]);
+				if ($player->getInventory()->canAddItem($item)) {
+					EconomyAPI::getInstance()->reduceMoney($player->getName(), $this->data["price"]);
+					EconomyAPI::getInstance()->addMoney($this->data["player"], $this->data["price"]);
+					$player->getInventory()->addItem($item);
+					$cls = new YamlConfig();
+					$cls->removeItem($this->data["id"]);
+					$player->sendMessage("[§aTRADE§r] 購入が完了しました！");
+					$target = Server::getInstance()->getPlayer($this->data["player"]);
+					if ($target instanceof Player) {
+						$target->sendMessage("[§aTRADE§r] ID:{$this->id} が購入されました。");
+					}
+					Server::getInstance()->getLogger()->notice("§r[§aTRADE§r] {$player->getName()}がID:{$this->id} {$this->data["player"]}の{$this->data["itemid"]}:{$this->data["itemdamage"]} {$this->data["amount"]}個を{$this->data["price"]}￥の取引が成立しました");
+					return;
+				}
+				$player->sendMessage("[§aTRADE§r] これ以上アイテムを持ません");
 				return;
 			}
-			$player->sendMessage("[§aTRADE§r] これ以上アイテムを持ません");
+			$player->sendForm(new SearchIDForm());
 			return;
+		}else{
+			$player->sendMessage("[§aTRADE§r] 残念ながら買われてしまったようです");
 		}
-		$player->sendForm(new SearchIDForm());
-		return;
 	}
-
 	public function jsonSerialize() {
 		$cls=new YamlConfig();
 		$this->data=$cls->getMarketData($this->id);
