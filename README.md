@@ -7,7 +7,7 @@
 フリーマーケットです。
 
 ### コマンド
-/command フリーマーケットを開く
+/trade フリーマーケットを開く
 
 ### 連絡先
 twitter https://twitter.com/Dev_yrs
