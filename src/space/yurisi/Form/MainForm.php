@@ -1,11 +1,10 @@
 <?php
-
+declare(strict_types=1);
 
 namespace space\yurisi\Form;
 
-
 use pocketmine\form\Form;
-use pocketmine\Player;
+use pocketmine\player\Player;
 use space\yurisi\Form\Buy\BuyForm;
 use space\yurisi\Form\Sell\SellForm;
 
@@ -28,13 +27,13 @@ class MainForm implements Form {
 			$player->sendMessage("[§aTRADE§r] Error:インベントリにアイテムが存在しません");
 			return;
 		}
-		$player->sendForm(new SellForm($player));
+		$player->sendForm(new SellForm());
 	}
 
 	/**
 	 * Specify data which should be serialized to JSON
 	 * @link https://php.net/manual/en/jsonserializable.jsonserialize.php
-	 * @return mixed data which can be serialized by <b>json_encode</b>,
+	 * @return array data which can be serialized by <b>json_encode</b>,
 	 * which is a value of any type other than a resource.
 	 * @since 5.4.0
 	 */
